@@ -29,7 +29,7 @@ function c71525232.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c71525232.damfilter(c)
 	if c:IsFaceup() then
-		return math.max(c:GetAttack(),0)
+		return c:GetAttack()
 	else return 0 end
 end
 function c71525232.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -42,7 +42,9 @@ function c71525232.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c71525232.filter(c)
-	return math.max(c:GetAttack(),0)
+	if c:IsPreviousPosition(POS_FACEUP) then
+		return c:GetPreviousAttackOnField()
+	else return 0 end
 end
 function c71525232.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
