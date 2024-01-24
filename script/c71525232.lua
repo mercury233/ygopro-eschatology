@@ -42,7 +42,7 @@ function c71525232.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c71525232.filter(c)
-	return math.max(c:GetTextAttack(),0)
+	return math.max(c:GetAttack(),0)
 end
 function c71525232.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
