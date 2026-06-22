@@ -9,6 +9,7 @@ function c82301904.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCondition(c82301904.spcon)
+	e2:SetTarget(c82301904.sptg)
 	e2:SetOperation(c82301904.spop)
 	c:RegisterEffect(e2)
 	--to grave
@@ -32,11 +33,20 @@ function c82301904.spcon(e,c)
 	local g=Duel.GetMatchingGroup(c82301904.spcostfilter,tp,LOCATION_GRAVE,0,nil)
 	return g:CheckSubGroup(aux.gfcheck,2,2,Card.IsAttribute,ATTRIBUTE_LIGHT,ATTRIBUTE_DARK)
 end
-function c82301904.spop(e,tp,eg,ep,ev,re,r,rp,c)
+function c82301904.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	local g=Duel.GetMatchingGroup(c82301904.spcostfilter,tp,LOCATION_GRAVE,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local sg=g:SelectSubGroup(tp,aux.gfcheck,false,2,2,Card.IsAttribute,ATTRIBUTE_LIGHT,ATTRIBUTE_DARK)
-	Duel.Remove(sg,POS_FACEUP,REASON_COST)
+	local sg=g:SelectSubGroup(tp,aux.gfcheck,true,2,2,Card.IsAttribute,ATTRIBUTE_LIGHT,ATTRIBUTE_DARK)
+	if sg then
+		sg:KeepAlive()
+		e:SetLabelObject(sg)
+		return true
+	else return false end
+end
+function c82301904.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	local sg=e:GetLabelObject()
+	Duel.Remove(sg,POS_FACEUP,REASON_SPSUMMON)
+	sg:DeleteGroup()
 end
 function c82301904.sgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
@@ -53,6 +63,8 @@ function c82301904.sgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(g,REASON_EFFECT)
 	local og=Duel.GetOperatedGroup()
 	local ct=og:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)
-	Duel.BreakEffect()
-	Duel.Damage(1-tp,ct*300,REASON_EFFECT)
+	if ct>0 then
+		Duel.BreakEffect()
+		Duel.Damage(1-tp,ct*300,REASON_EFFECT)
+	end
 end
